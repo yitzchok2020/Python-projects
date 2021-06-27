@@ -1,0 +1,186 @@
+from termcolor import colored
+import numpy as np
+import os
+
+grid = [
+  # 0    1    2    3    4    5    6
+  [' ', ' ', ' ', ' ', ' ', ' ', ' '], # 0
+  # 0    1    2    3    4    5    6
+  [' ', ' ', ' ', ' ', ' ', ' ', ' '], # 1
+  # 0    1    2    3    4    5    6
+  [' ', ' ', ' ', ' ', ' ', ' ', ' '], # 2
+   # 0    1    2    3    4    5    6
+  [' ', ' ', ' ', ' ', ' ', ' ', ' '], # 3
+   # 0    1    2    3    4    5    6
+  [' ', ' ', ' ', ' ', ' ', ' ', ' '], # 4
+   # 0    1    2    3    4    5    6
+  [' ', ' ', ' ', ' ', ' ', ' ', ' '], # 
+  ]
+
+
+#-----------Functions-------------------
+def display():
+  
+  print(f"""
+  ----------------------
+  | {grid[0][0]}| {grid[0][1]}| {grid[0][2]}| {grid[0][3]}| {grid[0][4]}| {grid[0][5]}| {grid[0][6]}|
+  ----------------------
+  | {grid[1][0]}| {grid[1][1]}| {grid[1][2]}| {grid[1][3]}| {grid[1][4]}| {grid[1][5]}| {grid[1][6]}|
+  ----------------------
+  | {grid[2][0]}| {grid[2][1]}| {grid[2][2]}| {grid[2][3]}| {grid[2][4]}| {grid[2][5]}| {grid[2][6]}|
+  ----------------------
+  | {grid[3][0]}| {grid[3][1]}| {grid[3][2]}| {grid[3][3]}| {grid[3][4]}| {grid[3][5]}| {grid[3][6]}|
+  ----------------------
+  | {grid[4][0]}| {grid[4][1]}| {grid[4][2]}| {grid[4][3]}| {grid[4][4]}| {grid[4][5]}| {grid[4][6]}|
+  ----------------------
+  | {grid[5][0]}| {grid[5][1]}| {grid[5][2]}| {grid[5][3]}| {grid[5][4]}| {grid[5][5]}| {grid[5][6]}|
+  ----------------------
+  """)
+
+
+def valid_move(x,y):
+  if grid[x][y] != ' ':
+    return False
+  else:
+    return True  
+
+def checkDiagonals(player):
+  np_grid = np.array(grid)
+  # Getting '/' diagonals first
+  diags = [np_grid[::-1, :].diagonal(i) for i in range(-3, 4)]
+  # Using the extend() method to get the '\' diagonals by changing range
+  diags.extend(np_grid.diagonal(i) for i in range(3, -4, -1))
+  # At this point diags has both diagonals, now to check the arrays for a winner.
+  for i in diags:
+    counter = 0
+    for j in i:
+      if j == player:
+        counter += 1
+      else:
+        counter = 0 
+      
+      if counter == 4:
+        return True
+
+
+def is_winner(player):
+  
+  # Horizontal Rows Check - Done
+  for row in grid:
+    counter = 0
+    # Loop through each row
+    for i in row:
+      if i == player:
+        counter += 1
+        # Right after updating counter, we check if player has won.
+        if counter == 4:
+          return True
+      else:
+        counter = 0
+  
+  # Vertical Cols Check - Done
+  for col in range(0, 7):
+    counter = 0
+    for row in range (0, 6):
+      if grid[row][col] == player:
+        counter += 1
+        if counter == 4:
+          return True
+      else:
+        counter = 0  
+
+  # Function to check for diagonal winners
+  if checkDiagonals(player):
+    return True
+  
+  return False
+
+
+
+
+
+def validColumn(column):
+  '''
+  This takes a col from the user, and returns the next available row.
+  '''
+  if grid[0][column] != " ":
+    return "Full"
+
+  for i in range(5, -1, -1):
+    if grid[i][col] == " ":
+      return i
+
+def is_tie():
+   for col in grid:
+    for i in col:
+      if i == ' ':
+        return False
+    return True
+
+
+def valid_coordinate(player):
+  '''
+  Function takes player name as parameter, then does 3 checks to make sure the col is in the allowable range. Then returns the col.
+  '''
+  while True:
+    user_input = input(f"{player} pick your column!(0-6) ")
+    # 3 Checks that must pass for while loop to end
+    if len(user_input) == 1:
+      if user_input.isdigit():
+        if  0 >= int(user_input) or int(user_input) <= 6:
+          return int(user_input)
+    
+    print("Invalid Col, please choose between 0-6!")
+  
+
+      
+
+
+  col = int(user_input)
+
+  return col  
+
+# Game Loop 
+
+# Game setup
+
+player_1 = input("Enter player 1 name: ")
+player_1_sym = colored('O', 'yellow', attrs=['bold'])
+
+player_2 = input("Enter player 2 name: ")
+player_2_sym = colored('0', 'red', attrs=['bold'])
+
+while True:
+  display()
+
+  # Player one turn
+  col = valid_coordinate(player_1)
+  row = validColumn(col)
+
+  grid[row][col] = player_1_sym
+  
+  os.system('clear')
+  display()
+  if is_winner(player_1_sym):
+    print("You have won!")
+    break
+
+  if is_tie():
+    print("This is a tie game, play again soon")
+    break 
+
+  # Player two turn
+  col = valid_coordinate(player_2)
+  row = validColumn(col)
+
+  grid[row][col] = player_2_sym
+  os.system('clear')
+
+  if is_winner(player_2_sym):
+    print("You have won!")
+    display()
+    break
+
+  if is_tie():
+    print("This is a tie game, play again soon")
+    break   
