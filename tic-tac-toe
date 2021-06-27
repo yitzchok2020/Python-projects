@@ -1,0 +1,180 @@
+import os
+from termcolor import  colored
+
+
+grid = [
+  # 0    1    2
+  [' ', ' ', ' '], # 0
+  # 0    1    2
+  [' ', ' ', ' '], # 1
+  # 0    1    2
+  [' ', ' ', ' ']  # 2
+]
+
+# ------ Functions ---------
+def display():
+  os.system('clear')
+  print("""
+*****************
+** Tic Tac Toe **
+*****************
+  """)
+  print(f"""
+  -------------
+  | {grid[0][0]} | {grid[0][1]} | {grid[0][2]} |
+  -------------
+  | {grid[1][0]} | {grid[1][1]} | {grid[1][2]} |
+  -------------
+  | {grid[2][0]} | {grid[2][1]} | {grid[2][2]} |
+  -------------
+""")
+
+def valid_move(x,y):
+  '''
+  Function takes x,y coordinates and checks if the spot on the grid is empty or not.
+  '''
+  if grid[x][y] != ' ':
+    return False
+  else:
+    return True
+
+def is_winner(player): #example: "X"
+  # Checking Rows for winner
+  counter = 0
+  for row in grid:
+    # The inner loop, checks each element in the row.
+    for i in row:
+      if i == player:
+        counter += 1
+    # Before we go to next row, check if counter == 3, if yes return True, else set counter back to 0
+    if counter == 3:
+      return True
+    else:
+      counter = 0  
+  
+  # Checking Cols for winner
+  for col in range(0, 3):
+    for row in range(0,3):
+      if grid[row][col] == player:
+        counter += 1
+    if counter == 3:
+      return True
+    else:
+      counter = 0
+
+  # Check Right diagonal for winner
+  col = 2
+  for row in range(0,3):
+    if grid[row][col] == player:
+      counter += 1
+    col -= 1
+    if counter == 3:
+      return True
+
+  # Reset counter
+  counter = 0
+  # Check Left diagonal for winner
+  for i in range(0, 3):
+    if grid[i][i] == player: 
+      counter += 1
+    if counter == 3:
+      return True
+   
+
+
+def is_tie():
+  # for loop to go through the whole grid to check if there are any open spots. 
+  for row in grid:
+    for i in row:
+      if i == ' ':
+        return False
+  return True
+
+def valid_coordinates():
+  user_input = input("Enter move: ")
+  # Core structure of coordinates
+  if len(user_input) != 3:
+    return False
+  elif not user_input[0].isdigit() or not user_input[2].isdigit():
+    return False
+  elif user_input[1] != ' ':
+    return False
+  # Checking to make sure numbers are in range 
+  if int(user_input[0]) > 2 or int(user_input[2]) > 2:
+    return False
+  elif int(user_input[0]) < 0 or int(user_input[2]) < 0:
+    return False
+  # If all checks passed, converted user_input into x, y coordinates and return those values.
+
+  x = int(user_input[0])
+  y = int(user_input[2])
+
+  return [x,y]
+
+
+#-------------------------
+#--------- Game Loop -----
+
+display()
+
+while True:
+
+  # Player 1
+  player_1_symbol = colored("X", 'red', attrs=['bold'])
+  while True:
+    user_input = valid_coordinates() # False
+   
+    if user_input:
+      x = user_input[0]
+      y = user_input[1]
+      # Only executes when user_input is in correct format
+      if valid_move(x,y) == True:
+        grid[x][y] = player_1_symbol
+        break
+      else:
+        print("Invalid move")
+    # If user_input is invalid
+    else:
+      print("Invalid move")
+      
+
+  display()
+
+  if is_winner(player_1_symbol):
+    print("Player 1 has won!")
+    break
+
+  if is_tie():
+    print("This is a tie game. Play again soon.")
+    break  
+
+    
+
+  # Player 2
+  player_2_symbol = colored("O", 'blue', attrs=['bold'])
+  while True:
+    user_input = valid_coordinates()
+
+    if user_input:
+      x = user_input[0]
+      y = user_input[1]
+
+      if valid_move(x,y) == True:
+          grid[x][y] = player_2_symbol
+          break
+      else:
+        print("Invalid move")
+    else:
+      print("Invalid move")
+
+
+
+  display()
+
+  if is_winner(player_2_symbol):
+    print("Player 2 has won!")
+    break
+
+  if is_tie():
+    print("This is a tie game. Play again soon.")
+    break 
